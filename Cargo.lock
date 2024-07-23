@@ -14,6 +14,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "anybuf"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9a03eb4d55fa21466cac727930be07f82581223ee04bcaf61f934e98b7ecb859"
+
+[[package]]
 name = "anyhow"
 version = "1.0.79"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -57,6 +63,12 @@ name = "base64ct"
 version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8c3c1a368f70d6cf7302d78f8f7093da241fb8e8807c05cc9e51a125895a6d5b"
+
+[[package]]
+name = "bech32"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cf9ff0bbfd639f15c74af777d81383cf53efb7c93613f6cab67c6c11e05bbf8b"
 
 [[package]]
 name = "bech32"
@@ -220,7 +232,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "712fe58f39d55c812f7b2c84e097cdede3a39d520f89b6dc3153837e31741927"
 dependencies = [
  "base64",
- "bech32",
+ "bech32 0.9.1",
  "bnum",
  "cosmwasm-crypto",
  "cosmwasm-derive",
@@ -233,6 +245,16 @@ dependencies = [
  "sha2 0.10.8",
  "static_assertions",
  "thiserror",
+]
+
+[[package]]
+name = "cosmwasm-storage"
+version = "1.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "66de2ab9db04757bcedef2b5984fbe536903ada4a8a9766717a4a71197ef34f6"
+dependencies = [
+ "cosmwasm-std",
+ "serde",
 ]
 
 [[package]]
@@ -307,7 +329,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "67fff029689ae89127cf6d7655809a68d712f3edbdb9686c70b018ba438b26ca"
 dependencies = [
  "anyhow",
- "bech32",
+ "bech32 0.9.1",
  "cosmwasm-std",
  "cw-storage-plus 1.2.0",
  "cw-utils 1.0.3",
@@ -325,6 +347,17 @@ name = "cw-storage-plus"
 version = "0.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dc6cf70ef7686e2da9ad7b067c5942cd3e88dd9453f7af42f54557f8af300fb0"
+dependencies = [
+ "cosmwasm-std",
+ "schemars",
+ "serde",
+]
+
+[[package]]
+name = "cw-storage-plus"
+version = "0.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d9b6f91c0b94481a3e9ef1ceb183c37d00764f8751e39b45fc09f4d9b970d469"
 dependencies = [
  "cosmwasm-std",
  "schemars",
@@ -359,6 +392,21 @@ dependencies = [
 
 [[package]]
 name = "cw-utils"
+version = "0.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d6a84c6c1c0acc3616398eba50783934bd6c964bad6974241eaee3460c8f5b26"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw2 0.16.0",
+ "schemars",
+ "semver",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
+name = "cw-utils"
 version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1c4a657e5caacc3a0d00ee96ca8618745d050b8f757c709babafb81208d4239c"
@@ -381,6 +429,19 @@ dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
  "cw-storage-plus 0.15.1",
+ "schemars",
+ "serde",
+]
+
+[[package]]
+name = "cw2"
+version = "0.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "91398113b806f4d2a8d5f8d05684704a20ffd5968bf87e3473e1973710b884ad"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-storage-plus 0.16.0",
  "schemars",
  "serde",
 ]
@@ -441,6 +502,21 @@ dependencies = [
  "semver",
  "serde",
  "thiserror",
+]
+
+[[package]]
+name = "cw20-ics20-msg"
+version = "0.0.3"
+source = "git+https://github.com/oraichain/ibc-bridge-wasm.git?rev=e3d5a3a474e8b2beac2ef5947abf6452d69495e4#e3d5a3a474e8b2beac2ef5947abf6452d69495e4"
+dependencies = [
+ "anybuf",
+ "bech32 0.8.1",
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cw-storage-plus 1.2.0",
+ "cw20 1.1.2",
+ "oraiswap",
+ "prost 0.11.9",
 ]
 
 [[package]]
@@ -888,11 +964,11 @@ version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "583150155911cb93ef38108259bcfdf19b85b75ef9e98dcd88927fcf24a809b3"
 dependencies = [
- "bech32",
+ "bech32 0.9.1",
  "cosmos-sdk-proto 0.20.0",
  "cosmwasm-schema",
  "cosmwasm-std",
- "protobuf 3.3.0",
+ "protobuf 3.5.0",
  "schemars",
  "serde",
  "serde-json-wasm 1.0.0",
@@ -905,13 +981,13 @@ version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "46f60e477bd71007d9ff78ae020ec1c6b3b47798578af6151429434d86472efc"
 dependencies = [
- "bech32",
+ "bech32 0.9.1",
  "cosmos-sdk-proto 0.20.0",
  "cosmwasm-schema",
  "cosmwasm-std",
  "prost 0.12.3",
  "prost-types 0.12.3",
- "protobuf 3.3.0",
+ "protobuf 3.5.0",
  "schemars",
  "serde",
  "serde-json-wasm 1.0.0",
@@ -951,6 +1027,24 @@ name = "opaque-debug"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "624a8340c38c1b80fd549087862da4ba43e08858af025b236e509b6649fc13d5"
+
+[[package]]
+name = "oraiswap"
+version = "0.2.0"
+source = "git+https://github.com/oraichain/oraiswap.git?rev=a5cd2ba6aa64c256248683ee5b80d5a2542343f2#a5cd2ba6aa64c256248683ee5b80d5a2542343f2"
+dependencies = [
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cosmwasm-storage",
+ "cw-multi-test",
+ "cw-utils 0.16.0",
+ "cw20 1.1.2",
+ "cw20-base",
+ "protobuf 3.5.0",
+ "schemars",
+ "serde",
+ "thiserror",
+]
 
 [[package]]
 name = "osmosis-std"
@@ -1086,9 +1180,9 @@ dependencies = [
 
 [[package]]
 name = "protobuf"
-version = "3.3.0"
+version = "3.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b65f4a8ec18723a734e5dc09c173e0abf9690432da5340285d536edcb4dac190"
+checksum = "df67496db1a89596beaced1579212e9b7c53c22dca1d9745de00ead76573d514"
 dependencies = [
  "bytes",
  "once_cell",
@@ -1098,9 +1192,9 @@ dependencies = [
 
 [[package]]
 name = "protobuf-support"
-version = "3.3.0"
+version = "3.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6872f4d4f4b98303239a2b5838f5bbbb77b01ffc892d627957f37a22d7cfe69c"
+checksum = "70e2d30ab1878b2e72d1e2fc23ff5517799c9929e2cf81a8516f9f4dcf2b9cf3"
 dependencies = [
  "thiserror",
 ]
@@ -1335,6 +1429,8 @@ dependencies = [
  "cw-utils 1.0.3",
  "cw2 1.1.2",
  "cw20 1.1.2",
+ "cw20-ics20-msg",
+ "prost 0.11.9",
  "skip",
  "test-case",
  "thiserror",
@@ -1760,7 +1856,7 @@ dependencies = [
  "osmosis-std-derive",
  "prost 0.11.9",
  "prost-types 0.11.9",
- "protobuf 3.3.0",
+ "protobuf 3.5.0",
  "schemars",
  "serde",
  "uint",

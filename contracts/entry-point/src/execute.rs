@@ -9,10 +9,11 @@ use crate::{
     },
 };
 use cosmwasm_std::{
-    from_json, to_json_binary, Addr, BankMsg, Coin, CosmosMsg, DepsMut, Env, MessageInfo, Response,
-    SubMsg, Uint128, WasmMsg,
+    from_json, to_json_binary, Addr, BankMsg, Binary, Coin, CosmosMsg, DepsMut, Env, MessageInfo,
+    Response, SubMsg, Uint128, WasmMsg,
 };
 use cw20::{Cw20Coin, Cw20ReceiveMsg};
+use cw20_ics20_msg::universal_swap_memo::Memo;
 use cw_utils::one_coin;
 use skip::{
     asset::{get_current_asset_available, Asset},
@@ -78,6 +79,7 @@ pub fn receive_cw20(
             post_swap_action,
             affiliates,
         ),
+        Cw20HookMsg::UniversalSwap { memo } => execute_universal_swap(deps, env, info, memo),
     }
 }
 
@@ -156,6 +158,18 @@ pub fn execute_update_config(
 
     Ok(response)
 }
+
+pub fn execute_universal_swap(
+    deps: DepsMut,
+    env: Env,
+    info: MessageInfo,
+    memo: String,
+) -> ContractResult<Response> {
+    let mut response: Response = Response::new().add_attribute("action", "execute_universal_swap");
+    let memo_data = Memo::decode_memo(Binary::from_base64(&memo)?)?;
+    Ok(response)
+}
+
 // Main entry point for the contract
 // Dispatches the swap and post swap action
 #[allow(clippy::too_many_arguments)]
