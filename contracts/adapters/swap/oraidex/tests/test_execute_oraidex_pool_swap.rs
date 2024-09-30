@@ -2,15 +2,15 @@ use std::vec;
 
 use cosmwasm_std::{
     testing::{mock_dependencies_with_balances, mock_env, mock_info},
-    to_json_binary, Addr, Coin, Decimal, QuerierResult,
+    to_json_binary, Addr, Coin, QuerierResult,
     ReplyOn::Never,
     SubMsg, SystemResult, Uint128, WasmMsg, WasmQuery,
 };
 use cw20::{BalanceResponse, Cw20ExecuteMsg};
 use oraiswap::{
-    asset::{Asset as OraiswapAsset, AssetInfo},
+    asset::AssetInfo,
     mixed_router::{
-        Cw20HookMsg as OraidexRouterHookMsg, ExecuteMsg as OraidexRouterExecuteMsg,
+        ExecuteMsg as OraidexRouterExecuteMsg,
         SwapOperation as OraidexSwapOperation,
     },
     converter::ExecuteMsg as ConverterExecuteMsg
