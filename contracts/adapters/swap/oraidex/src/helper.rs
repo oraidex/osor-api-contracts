@@ -77,7 +77,7 @@ pub fn parse_to_swap_msg(
                 return Ok((
                     converter,
                     to_json_binary(&ConverterExecuteMsg::ConvertReverse {
-                        from_asset: denom_to_asset_info(deps.api, &operation.denom_in),
+                        from_asset: denom_to_asset_info(deps.api, &operation.denom_out),
                     })?,
                 ));
             }

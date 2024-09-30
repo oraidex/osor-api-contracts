@@ -158,7 +158,7 @@ struct Params {
                     msg: to_json_binary(&Cw20ExecuteMsg::Send { 
                         contract: "orai1converter".to_string(), 
                         amount: Uint128::new(100u128), 
-                      msg: to_json_binary(&ConverterExecuteMsg::ConvertReverse { from_asset: AssetInfo::Token { contract_addr: Addr::unchecked("orai123") } } )?,
+                      msg: to_json_binary(&ConverterExecuteMsg::ConvertReverse { from_asset: AssetInfo::Token { contract_addr: Addr::unchecked("orai123_converted") } } )?,
                     })?,
                    
                     funds: vec![],
