@@ -207,7 +207,6 @@ fn execute_oraidex_pool_swap(
 
     // Get the current asset available on contract to swap in
     let offer_asset = get_current_asset_available(&deps, &env, &operation.denom_in)?;
-
     // Error if the offer asset amount is zero
     if offer_asset.amount().is_zero() {
         return Err(ContractError::NoOfferAssetAmount);

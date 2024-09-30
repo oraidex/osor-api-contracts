@@ -2,7 +2,9 @@ use cosmwasm_std::{to_json_binary, Addr, Api, Binary, Deps, StdError};
 
 use oraiswap::asset::AssetInfo;
 use oraiswap::converter::ExecuteMsg as ConverterExecuteMsg;
-use oraiswap::mixed_router::SwapOperation as OraidexSwapOperation;
+use oraiswap::mixed_router::{
+    ExecuteMsg as OraidexRouterExecuteMsg, SwapOperation as OraidexSwapOperation,
+};
 use oraiswap_v3::{percentage::Percentage, FeeTier, PoolKey};
 use skip::swap::SwapOperation;
 
@@ -90,24 +92,28 @@ pub fn parse_to_swap_msg(
         }
     }
 
+    let mut hop_swap_requests: Vec<OraidexSwapOperation> = vec![];
+    let oraidex_router_contract_address = ORAIDEX_ROUTER_ADDRESS.load(deps.storage)?;
+
     // case 2: Swap v3
     if operation.pool.contains("-") {
-        let oraidex_router_contract_address = ORAIDEX_ROUTER_ADDRESS.load(deps.storage)?;
         let pool_key = convert_pool_id_to_v3_pool_key(&operation.pool)?;
         let x_to_y = pool_key.token_x == operation.denom_in;
-        return Ok((
-            oraidex_router_contract_address,
-            to_json_binary(&OraidexSwapOperation::SwapV3 { pool_key, x_to_y })?,
-        ));
-    }
-
-    // case 3: Swap v2
-    let oraidex_router_contract_address = ORAIDEX_ROUTER_ADDRESS.load(deps.storage)?;
-    Ok((
-        oraidex_router_contract_address,
-        to_json_binary(&OraidexSwapOperation::OraiSwap {
+        hop_swap_requests.push(OraidexSwapOperation::SwapV3 { pool_key, x_to_y });
+    } else {
+        // case 3: Swap v2
+        hop_swap_requests.push(OraidexSwapOperation::OraiSwap {
             offer_asset_info: denom_to_asset_info(deps.api, &operation.denom_in),
             ask_asset_info: denom_to_asset_info(deps.api, &operation.denom_out),
+        })
+    };
+
+    Ok((
+        oraidex_router_contract_address,
+        to_json_binary(&OraidexRouterExecuteMsg::ExecuteSwapOperations {
+            operations: hop_swap_requests,
+            minimum_receive: None,
+            to: None,
         })?,
     ))
 }
