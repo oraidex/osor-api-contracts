@@ -13,7 +13,7 @@ use oraiswap::{
         ExecuteMsg as OraidexRouterExecuteMsg,
         SwapOperation as OraidexSwapOperation,
     },
-    converter::ExecuteMsg as ConverterExecuteMsg
+    converter::{ExecuteMsg as ConverterExecuteMsg, Cw20HookMsg as ConverterCw20HookMsg}
 };
 use skip::swap::{ExecuteMsg, SwapOperation};
 use skip_api_swap_adapter_oraidex::{
@@ -158,7 +158,7 @@ struct Params {
                     msg: to_json_binary(&Cw20ExecuteMsg::Send { 
                         contract: "orai1converter".to_string(), 
                         amount: Uint128::new(100u128), 
-                      msg: to_json_binary(&ConverterExecuteMsg::ConvertReverse { from_asset: AssetInfo::Token { contract_addr: Addr::unchecked("orai123_converted") } } )?,
+                      msg: to_json_binary(&ConverterCw20HookMsg::ConvertReverse { from: AssetInfo::Token { contract_addr: Addr::unchecked("orai123_converted") } } )?,
                     })?,
                    
                     funds: vec![],

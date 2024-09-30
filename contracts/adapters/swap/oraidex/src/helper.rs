@@ -1,7 +1,7 @@
 use cosmwasm_std::{to_json_binary, Addr, Api, Binary, Deps, StdError};
 
 use oraiswap::asset::AssetInfo;
-use oraiswap::converter::ExecuteMsg as ConverterExecuteMsg;
+use oraiswap::converter::{Cw20HookMsg as ConverterCw20HookMsg, ExecuteMsg as ConverterExecuteMsg};
 use oraiswap::mixed_router::{
     ExecuteMsg as OraidexRouterExecuteMsg, SwapOperation as OraidexSwapOperation,
 };
@@ -73,14 +73,24 @@ pub fn parse_to_swap_msg(
         let converter = deps.api.addr_validate(parts[1])?;
 
         match parts[0] {
-            "convert_reverse" => {
-                return Ok((
-                    converter,
-                    to_json_binary(&ConverterExecuteMsg::ConvertReverse {
-                        from_asset: denom_to_asset_info(deps.api, &operation.denom_out),
-                    })?,
-                ));
-            }
+            "convert_reverse" => match deps.api.addr_validate(&operation.denom_in) {
+                Ok(_addr) => {
+                    return Ok((
+                        converter,
+                        to_json_binary(&ConverterCw20HookMsg::ConvertReverse {
+                            from: denom_to_asset_info(deps.api, &operation.denom_out),
+                        })?,
+                    ));
+                }
+                Err(_) => {
+                    return Ok((
+                        converter,
+                        to_json_binary(&ConverterExecuteMsg::ConvertReverse {
+                            from_asset: denom_to_asset_info(deps.api, &operation.denom_out),
+                        })?,
+                    ));
+                }
+            },
             "convert" => {
                 return Ok((converter, to_json_binary(&ConverterExecuteMsg::Convert {})?));
             }
