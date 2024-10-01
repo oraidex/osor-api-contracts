@@ -52,3 +52,6 @@ typings/
 .eslintcache
 
 .yarn
+
+dist
+
