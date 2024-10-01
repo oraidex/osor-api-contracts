@@ -214,6 +214,12 @@ pub struct SwapOperation {
     pub interface: Option<Binary>,
 }
 
+#[cw_serde]
+pub struct PoolMsg {
+    pub contract: String,
+    pub msg: String, // base64
+}
+
 // ORAICHAIN universal swap conversion
 impl SwapOperation {
     pub fn from(operations: Vec<UniversalSwapOperation>) -> Vec<Self> {

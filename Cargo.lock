@@ -1741,6 +1741,7 @@ dependencies = [
  "dexter-weighted-pool",
  "oraiswap 0.2.0 (git+https://github.com/oraichain/oraiswap.git?rev=843b39ca6c02ae8f2de628f4ddd444173d4de3ba)",
  "oraiswap-v3",
+ "serde-json-wasm 0.5.2",
  "skip",
  "test-case",
  "thiserror",

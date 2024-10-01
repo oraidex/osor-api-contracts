@@ -1,12 +1,11 @@
-use cosmwasm_std::{to_json_binary, Addr, Api, Binary, Deps, StdError};
+use cosmwasm_std::{from_json, to_json_binary, Addr, Api, Binary, Deps, StdError};
 
 use oraiswap::asset::AssetInfo;
-use oraiswap::converter::{Cw20HookMsg as ConverterCw20HookMsg, ExecuteMsg as ConverterExecuteMsg};
 use oraiswap::mixed_router::{
     ExecuteMsg as OraidexRouterExecuteMsg, SwapOperation as OraidexSwapOperation,
 };
 use oraiswap_v3::{percentage::Percentage, FeeTier, PoolKey};
-use skip::swap::SwapOperation;
+use skip::swap::{PoolMsg, SwapOperation};
 
 use crate::{error::ContractError, state::ORAIDEX_ROUTER_ADDRESS};
 
@@ -58,72 +57,48 @@ pub fn convert_pool_id_to_v3_pool_key(pool_id: &str) -> Result<PoolKey, Contract
     })
 }
 
+// Function to parse the operation and generate swap or convert messages based on the PoolId
+// There are 3 cases:
+// - Arbitrarily action: poolId is base64 of PoolMsg
+// - Swap through Oraidex v2: poolID = `${pair_addr}`
+// - Swap through Oraidex v3: poolID = `${tokenX}-${tokenY}-${fee}-${tick_spacing}`
 pub fn parse_to_swap_msg(
     deps: &Deps,
     operation: SwapOperation,
 ) -> Result<(Addr, Binary), ContractError> {
-    // case 1: convert
-    if operation.pool.contains("convert") {
-        let parts: Vec<&str> = operation.pool.split('-').collect();
-        if parts.len() != 2 {
-            return Err(ContractError::Std(StdError::generic_err(
-                "Invalid convert type pool_id, require exactly 2 fields",
-            )));
+    match from_json(&Binary::from_base64(&operation.pool).unwrap_or_default()) {
+        Ok(PoolMsg { contract, msg }) => {
+            return Ok((
+                deps.api.addr_validate(&contract)?,
+                Binary::from_base64(&msg)?,
+            ))
         }
-        let converter = deps.api.addr_validate(parts[1])?;
+        _ => {
+            // swap on Oraidex
+            let mut hop_swap_requests: Vec<OraidexSwapOperation> = vec![];
+            let oraidex_router_contract_address = ORAIDEX_ROUTER_ADDRESS.load(deps.storage)?;
 
-        match parts[0] {
-            "convert_reverse" => match deps.api.addr_validate(&operation.denom_in) {
-                Ok(_addr) => {
-                    return Ok((
-                        converter,
-                        to_json_binary(&ConverterCw20HookMsg::ConvertReverse {
-                            from: denom_to_asset_info(deps.api, &operation.denom_out),
-                        })?,
-                    ));
-                }
-                Err(_) => {
-                    return Ok((
-                        converter,
-                        to_json_binary(&ConverterExecuteMsg::ConvertReverse {
-                            from_asset: denom_to_asset_info(deps.api, &operation.denom_out),
-                        })?,
-                    ));
-                }
-            },
-            "convert" => {
-                return Ok((converter, to_json_binary(&ConverterExecuteMsg::Convert {})?));
-            }
-            _ => {
-                return Err(ContractError::Std(StdError::generic_err(
-                    "Invalid convert type pool_id",
-                )));
-            }
+            // case 2: Swap v3
+            if operation.pool.contains("-") {
+                let pool_key = convert_pool_id_to_v3_pool_key(&operation.pool)?;
+                let x_to_y = pool_key.token_x == operation.denom_in;
+                hop_swap_requests.push(OraidexSwapOperation::SwapV3 { pool_key, x_to_y });
+            } else {
+                // case 3: Swap v2
+                hop_swap_requests.push(OraidexSwapOperation::OraiSwap {
+                    offer_asset_info: denom_to_asset_info(deps.api, &operation.denom_in),
+                    ask_asset_info: denom_to_asset_info(deps.api, &operation.denom_out),
+                })
+            };
+
+            return Ok((
+                oraidex_router_contract_address,
+                to_json_binary(&OraidexRouterExecuteMsg::ExecuteSwapOperations {
+                    operations: hop_swap_requests,
+                    minimum_receive: None,
+                    to: None,
+                })?,
+            ));
         }
     }
-
-    let mut hop_swap_requests: Vec<OraidexSwapOperation> = vec![];
-    let oraidex_router_contract_address = ORAIDEX_ROUTER_ADDRESS.load(deps.storage)?;
-
-    // case 2: Swap v3
-    if operation.pool.contains("-") {
-        let pool_key = convert_pool_id_to_v3_pool_key(&operation.pool)?;
-        let x_to_y = pool_key.token_x == operation.denom_in;
-        hop_swap_requests.push(OraidexSwapOperation::SwapV3 { pool_key, x_to_y });
-    } else {
-        // case 3: Swap v2
-        hop_swap_requests.push(OraidexSwapOperation::OraiSwap {
-            offer_asset_info: denom_to_asset_info(deps.api, &operation.denom_in),
-            ask_asset_info: denom_to_asset_info(deps.api, &operation.denom_out),
-        })
-    };
-
-    Ok((
-        oraidex_router_contract_address,
-        to_json_binary(&OraidexRouterExecuteMsg::ExecuteSwapOperations {
-            operations: hop_swap_requests,
-            minimum_receive: None,
-            to: None,
-        })?,
-    ))
 }

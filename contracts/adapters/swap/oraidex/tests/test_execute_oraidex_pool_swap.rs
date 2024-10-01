@@ -15,7 +15,7 @@ use oraiswap::{
     },
     converter::{ExecuteMsg as ConverterExecuteMsg, Cw20HookMsg as ConverterCw20HookMsg}
 };
-use skip::swap::{ExecuteMsg, SwapOperation};
+use skip::swap::{ExecuteMsg, PoolMsg, SwapOperation};
 use skip_api_swap_adapter_oraidex::{
     error::{ContractError, ContractResult},
     state::{ENTRY_POINT_CONTRACT_ADDRESS, ORAIDEX_ROUTER_ADDRESS},
@@ -117,7 +117,7 @@ struct Params {
         caller: "swap_contract_address".to_string(),
         contract_balance: vec![Coin::new(100, "os")],
         swap_operation: SwapOperation {
-                pool: "convert-orai1converter".to_string(),
+                pool: to_json_binary(&PoolMsg{ contract: "orai1converter".to_string(), msg:  to_json_binary(&ConverterExecuteMsg::Convert {})?.to_string()})?.to_string(),
                 denom_in: "orai123".to_string(),
                 denom_out: "orai123_converted".to_string(),
                 interface: None,
@@ -146,7 +146,7 @@ struct Params {
         caller: "swap_contract_address".to_string(),
         contract_balance: vec![Coin::new(100, "os")],
         swap_operation: SwapOperation {
-                pool: "convert_reverse-orai1converter".to_string(),
+                pool:  to_json_binary(&PoolMsg{ contract: "orai1converter".to_string(), msg:   to_json_binary(&ConverterCw20HookMsg::ConvertReverse { from: AssetInfo::Token { contract_addr: Addr::unchecked("orai123_converted") } } )?.to_string()})?.to_string(),
                 denom_in: "orai123".to_string(),
                 denom_out: "orai123_converted".to_string(),
                 interface: None,
