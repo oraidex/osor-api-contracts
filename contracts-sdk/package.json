@@ -1,0 +1,14 @@
+{
+  "name": "@oraichain/osor-api-contracts-sdk",
+  "version": "1.0.0",
+  "main": "build/index.js",
+  "files": [
+    "build/",
+    "@types"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "build:test": "tsc --project tsconfig.json"
+  },
+  "license": "MIT"
+}
