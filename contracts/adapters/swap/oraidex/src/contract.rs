@@ -220,7 +220,7 @@ fn execute_oraidex_pool_swap(
 
     Ok(Response::new()
         .add_message(swap_msg)
-        .add_attribute("action", "dispatch_astroport_pool_swap"))
+        .add_attribute("action", "dispatch_oraidex_pool_swap"))
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
