@@ -9,7 +9,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "declaration": false,
-    "outDir": "dist",
+    "outDir": "build",
     "typeRoots": ["node_modules/@types"],
     "allowJs": true,
     "esModuleInterop": true
