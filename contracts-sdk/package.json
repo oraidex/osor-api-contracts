@@ -1,0 +1,23 @@
+{
+  "name": "@oraichain/osor-api-contracts-sdk",
+  "version": "1.0.2",
+  "main": "build/index.js",
+  "files": [
+    "build/",
+    "@types",
+    "src/**/*.ts",
+    "@types/**/*.ts"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "build:test": "tsc --project tsconfig.json",
+    "deploy": "yarn publish --access public"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@cosmjs/amino": "0.31.3",
+    "@cosmjs/cosmwasm-stargate": "0.31.3",
+    "@cosmjs/crypto": "0.31.3",
+    "@cosmjs/proto-signing": "0.31.3"
+  }
+}
