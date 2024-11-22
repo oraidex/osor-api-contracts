@@ -2,7 +2,8 @@ use crate::{
     error::{ContractError, ContractResult},
     execute::{
         execute_post_swap_action, execute_swap_and_action, execute_swap_and_action_with_recover,
-        execute_universal_swap, execute_update_config, execute_user_swap, receive_cw20,
+        execute_universal_swap, execute_update_config, execute_user_swap, execute_withdraw_asset,
+        receive_cw20,
     },
     query::{query_ibc_transfer_adapter_contract, query_swap_venue_adapter_contract},
     reply::{reply_swap_and_action_with_recover, RECOVER_REPLY_ID},
@@ -16,6 +17,7 @@ use cosmwasm_std::{
     StdResult,
 };
 use cw2::set_contract_version;
+use oraiswap::universal_swap_memo::Memo;
 use skip::entry_point::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
 
 ///////////////
@@ -220,6 +222,9 @@ pub fn execute(
             ibc_wasm_contract_address,
         ),
         ExecuteMsg::UniversalSwap { memo } => execute_universal_swap(deps, env, info, None, memo),
+        ExecuteMsg::WithdrawAsset { coin, receiver } => {
+            execute_withdraw_asset(deps, info, coin, receiver)
+        }
     }
 }
 
@@ -245,4 +250,13 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
             to_json_binary(&query_ibc_transfer_adapter_contract(deps)?)
         }
     }
+}
+
+#[test]
+fn test_memo() {
+    let memo = "CpcBCgdvcmFpZGV4EosBCogBCj9vcmFpMTl0dGcwajd3NWtyODNqczMydG13bnd4eGRxOXJrbXc0bTNkN21uMmoyaGtwdWd3d2E0dHN6d3Nua2cSP29yYWkxNXVuOG1zeDNuNXpmOWFobHhtZmVxZDJrd2E1d20wbnJweGVyMzA0bTluZDVxNnFxMGc2c2t1NXBkZBoEb3JhaRIBMBiA/I+Y1c7ygxgiLyItCitvcmFpMW15Y21oeXJtZDZkdXNwNDA4cnRqZ3psazc3Mzh2aHRncXloeHh0KitvcmFpMW15Y21oeXJtZDZkdXNwNDA4cnRqZ3psazc3Mzh2aHRncXloeHh0";
+    println!(
+        "{:?}",
+        Memo::decode_memo(Binary::from_base64(memo).unwrap()).unwrap()
+    );
 }

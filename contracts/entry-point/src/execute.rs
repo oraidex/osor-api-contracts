@@ -93,6 +93,24 @@ pub fn receive_cw20(
 /// EXECUTE ENTRYPOINTS ///
 ///////////////////////////
 
+// withdraw stuck coin and transfer back to user
+// only owner can execute
+pub fn execute_withdraw_asset(
+    deps: DepsMut,
+    info: MessageInfo,
+    coin: Asset,
+    receiver: Option<Addr>,
+) -> Result<Response, ContractError> {
+    OWNER.assert_admin(deps.as_ref(), &info.sender)?;
+    let receiver = receiver.unwrap_or(info.sender);
+
+    let msg = coin.transfer(receiver.as_str());
+
+    Ok(Response::new()
+        .add_attributes(vec![("action", "withdraw_asset")])
+        .add_message(msg))
+}
+
 // update config
 pub fn execute_update_config(
     deps: DepsMut,

@@ -78,6 +78,10 @@ pub enum ExecuteMsg {
     UniversalSwap {
         memo: String,
     },
+    WithdrawAsset {
+        coin: Asset,
+        receiver: Option<Addr>,
+    },
 }
 
 /// This structure describes a CW20 hook message.
